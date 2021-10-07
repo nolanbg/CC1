@@ -10,10 +10,10 @@ let circle1 = {
 let circle2 = {
   x: undefined,
   y: 250,
-  size: 100,
+  size: 80,
   vx: 0,
   vy: 0,
-  speed: 3
+  speed: 10
 };
 
 let state = `title`; // Can be: title, simulation, love, sadness
@@ -25,20 +25,19 @@ function setup() {
 
 function setupCircles() {
   // Position circles separated from one another
-  circle1.x = width / 3;
-  circle2.x = 2 * width / 3;
+  circle1.x = 3 * width / 4;
+  circle2.x = width / 4;
 
   // Start circles moving in a random direction
   circle1.vx = random(-circle1.speed,circle1.speed);
   circle1.vy = random(-circle1.speed,circle1.speed);
-  circle2.vx = random(-circle2.speed,circle2.speed);
-  circle2.vy = random(-circle2.speed,circle2.speed);
+  circle2.vx = random(0,circle2.speed);
+  circle2.vy = random(0,0);
 }
 
 function draw() {
   background(0);
-circle1.x = mouseX;
-circle1.Y = mouseY;
+
   if (state === `title`) {
     title();
   }
@@ -52,7 +51,12 @@ circle1.Y = mouseY;
     sadness();
   }
 }
-
+//makes the second circle jitter back and forth
+  function teleport(){
+    if (circle2.x > windowWidth/2){
+      circle2.y = circle2.y + random(-20,20);
+    }
+  }
 function title() {
   push();
   textSize(64);
@@ -67,6 +71,8 @@ function simulation() {
   checkOffscreen();
   checkOverlap();
   display();
+  teleport();
+  circlePassed();
 }
 
 function love() {
@@ -86,16 +92,28 @@ function sadness() {
   text(`:(`,width/2,height/2);
   pop();
 }
-
+function escape() {
+  push();
+  textSize(64);
+  fill(0,150,0);
+  textAlign(CENTER,CENTER);
+  text(`You let them go:/`,width/2,height/2);
+  pop();
+}
 function move() {
   // Move the circles
-  circle1.x = circle1.x + circle1.vx;
-  circle1.y = circle1.y + circle1.vy;
+  circle1.x = 3*width/4;
+  circle1.y = mouseY;
 
   circle2.x = circle2.x + circle2.vx;
-  circle2.y = circle2.y + circle2.vy;
+  circle2.y = circle2.y;
 }
-
+//if the automated circle passed the user, the escape function is activated
+function circlePassed(){
+  if (circle2.x > circle1.x){
+    state  = `escape`;
+  }
+}
 function checkOffscreen() {
   // Check if the circles have gone offscreen
   if (isOffscreen(circle1) || isOffscreen(circle2)) {
